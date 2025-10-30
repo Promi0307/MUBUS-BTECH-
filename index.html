@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTECH PREYEROS - Student Voting</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            transform: translateY(20px) rotateX(10deg);
+        }
+
+        .card.active {
+            opacity: 1;
+            transform: translateY(0) rotateX(0);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: float 6s ease-in-out infinite;
+            background: linear-gradient(45deg, #ffeb3b, #ff9800, #ff5722);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: block;
+            margin: 30px auto;
+            width: 200px;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .position {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .position:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .position-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffeb3b;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .candidates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .candidate {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .candidate:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .candidate.selected {
+            background: rgba(76, 175, 80, 0.3);
+            box-shadow: 0 0 0 2px #4caf50;
+        }
+
+        .candidate input {
+            display: none;
+        }
+
+        .flowers {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+            font-size: 3rem;
+            animation: bloom 3s ease-in-out infinite;
+        }
+
+        @keyframes bloom {
+            0% { transform: scale(0.9); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(0.9); }
+        }
+
+        .confirmation-message {
+            text-align: center;
+            font-size: 1.8rem;
+            margin: 30px 0;
+            color: #4caf50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: floatAround 20s infinite linear;
+        }
+
+        @keyframes floatAround {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); }
+            25% { transform: translateY(-100px) translateX(100px) rotate(90deg); }
+            50% { transform: translateY(0) translateX(200px) rotate(180deg); }
+            75% { transform: translateY(100px) translateX(100px) rotate(270deg); }
+            100% { transform: translateY(0) translateX(0) rotate(360deg); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message {
+            color: #4caf50;
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ffa726);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: #ffa726;
+            transform: scale(1.2);
+        }
+
+        .step.completed {
+            background: #4caf50;
+        }
+
+        .admin-dashboard-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .admin-dashboard-link:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .candidate {
+                min-width: 100%;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <div class="container">
+        <header>
+            <h1>BTECH PREYEROS</h1>
+            <p class="subtitle">Vote for the student who satisfies you in all categories</p>
+        </header>
+        
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">1</div>
+            <div class="step" id="step2">2</div>
+            <div class="step" id="step3">3</div>
+        </div>
+        
+        <!-- Login Section -->
+        <section class="card active" id="loginSection">
+            <h2>Login to Vote</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="emailOrPhone">Email or Phone Number</label>
+                    <input type="text" id="emailOrPhone" placeholder="Enter your email or phone number" required>
+                    <div class="error-message" id="emailPhoneError">Please enter a valid email or phone number</div>
+                    <div class="success-message" id="emailPhoneSuccess">✓ Valid email/phone</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <div class="error-message" id="passwordError">Password must be at least 6 characters</div>
+                    <div class="success-message" id="passwordSuccess">✓ Valid password</div>
+                </div>
+                
+                <button type="submit" class="btn" id="loginBtn">Login & Vote</button>
+            </form>
+        </section>
+        
+        <!-- Voting Section -->
+        <section class="card" id="votingSection">
+            <h2>Cast Your Votes</h2>
+            <p style="text-align: center; margin-bottom: 30px;">Select your preferred candidate for each position</p>
+            
+            <form id="votingForm">
+                <div class="position">
+                    <h3 class="position-title">1. Best Admin of the Year</h3>
+                    <div class="candidates">
+                        <div class="candidate" data-value="victoria-jimmy">
+                            <input type="radio" name="best-admin" value="victoria-jimmy">
+                            <span>Victoria Jimmy</span>
+                        </div>
+                        <div class="candidate" data-value="wezzie">
+                            <input type="radio" name="best-admin" value="wezzie">
+                            <span>Wezzie</span>
+                        </div>
+                        <div class="candidate" data-value="favour">
+                            <input type="radio" name="best-admin" value="favour">
+                            <span>Favour</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="position">
+                    <h3 class="position-title">2. Best Active Student of the Year</h3>
+                    <div class="candidates">
+                        <div class="candidate" data-value="wachisa-kayinga">
+                            <input type="radio" name="best-student" value="wachisa-kayinga">
+                            <span>Wachisa Kayinga</span>
+                        </div>
+                        <div class="candidate" data-value="noel-batson">
+                            <input type="radio" name="best-student" value="noel-batson">
+                            <span>Noel Batson</span>
+                        </div>
+                        <div class="candidate" data-value="mums-investment">
+                            <input type="radio" name="best-student" value="mums-investment">
+                            <span>Mums Investment</span>
+                        </div>
+                        <div class="candidate" data-value="victoria-maphalabungu">
+                            <input type="radio" name="best-student" value="victoria-maphalabungu">
+                            <span>Victoria Maphalabungu</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="position">
+                    <h3 class="position-title">3. Best Advisor of the Year</h3>
+                    <div class="candidates">
+                        <div class="candidate" data-value="moses-festus">
+                            <input type="radio" name="best-advisor" value="moses-festus">
+                            <span>Moses Festus</span>
+                        </div>
+                        <div class="candidate" data-value="victoria-jimmy-advisor">
+                            <input type="radio" name="best-advisor" value="victoria-jimmy-advisor">
+                            <span>Victoria Jimmy</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="position">
+                    <h3 class="position-title">4. Best Group Representative of the Year</h3>
+                    <div class="candidates">
+                        <div class="candidate" data-value="bulah-al">
+                            <input type="radio" name="best-representative" value="bulah-al">
+                            <span>Bulah Al</span>
+                        </div>
+                        <div class="candidate" data-value="wachisa-kayinga-rep">
+                            <input type="radio" name="best-representative" value="wachisa-kayinga-rep">
+                            <span>Wachisa Kayinga</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="position">
+                    <h3 class="position-title">5. Best Information Provider</h3>
+                    <div class="candidates">
+                        <div class="candidate" data-value="promise-chisunkha">
+                            <input type="radio" name="best-info-provider" value="promise-chisunkha">
+                            <span>Promise Chisunkha</span>
+                        </div>
+                        <div class="candidate" data-value="moses-festus-info">
+                            <input type="radio" name="best-info-provider" value="moses-festus-info">
+                            <span>Moses Festus</span>
+                        </div>
+                        <div class="candidate" data-value="danie">
+                            <input type="radio" name="best-info-provider" value="danie">
+                            <span>Danie</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" id="submitVoteBtn">Submit Your Votes</button>
+            </form>
+        </section>
+        
+        <!-- Confirmation Section -->
+        <section class="card" id="confirmationSection">
+            <h2>Thank You for Voting!</h2>
+            <div class="confirmation-message">
+                Your voting is in progress. Wait for results on 25 October
+            </div>
+            <div class="flowers">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>🌹</span>
+                <span>🌷</span>
+                <span>🌸</span>
+                <span>💐</span>
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <p style="text-align: center; font-size: 1.2rem; margin-top: 30px;">
+                Congratulations to all nominees! Your participation matters.
+            </p>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" id="backToVoteBtn">Vote Again</button>
+            </div>
+        </section>
+    </div>
+    
+    <a href="#" class="admin-dashboard-link" id="adminDashboardLink">
+        <i class="fas fa-chart-bar"></i> Admin Dashboard
+    </a>
+
+    <script>
+        // Create floating elements
+        const floatingContainer = document.getElementById('floatingElements');
+        for (let i = 0; i < 15; i++) {
+            const element = document.createElement('div');
+            element.classList.add('floating-element');
+            element.style.width = `${Math.random() * 60 + 20}px`;
+            element.style.height = element.style.width;
+            element.style.left = `${Math.random() * 100}%`;
+            element.style.top = `${Math.random() * 100}%`;
+            element.style.animationDelay = `${Math.random() * 20}s`;
+            element.style.background = `rgba(255, 255, 255, ${Math.random() * 0.2})`;
+            floatingContainer.appendChild(element);
+        }
+
+        // DOM Elements
+        const loginSection = document.getElementById('loginSection');
+        const votingSection = document.getElementById('votingSection');
+        const confirmationSection = document.getElementById('confirmationSection');
+        const loginForm = document.getElementById('loginForm');
+        const votingForm = document.getElementById('votingForm');
+        const emailOrPhoneInput = document.getElementById('emailOrPhone');
+        const passwordInput = document.getElementById('password');
+        const emailPhoneError = document.getElementById('emailPhoneError');
+        const emailPhoneSuccess = document.getElementById('emailPhoneSuccess');
+        const passwordError = document.getElementById('passwordError');
+        const passwordSuccess = document.getElementById('passwordSuccess');
+        const adminDashboardLink = document.getElementById('adminDashboardLink');
+        const progressBar = document.getElementById('progress');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const backToVoteBtn = document.getElementById('backToVoteBtn');
+
+        // Current step
+        let currentStep = 1;
+
+        // Validation flags
+        let isEmailPhoneValid = false;
+        let isPasswordValid = false;
+
+        // Update progress bar and steps
+        function updateProgress() {
+            const progressPercent = (currentStep / 3) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            
+            step1.classList.remove('active', 'completed');
+            step2.classList.remove('active', 'completed');
+            step3.classList
